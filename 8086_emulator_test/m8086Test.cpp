@@ -1,14 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <m8086.hpp>
-
-using namespace lp;
-
-class M8086Test : public ::testing::Test
-{
-protected:
-	m8086::Processor mProcessor;
-};
+#include "8086TestFixture.hpp"
 
 TEST_F(M8086Test, CanSetAXRegisterAndGetMostSignificantByteInAH)
 {
@@ -100,6 +92,7 @@ TEST_F(M8086Test, CanSetDHAndALRegistersAndGetTheValueInDX)
 
 TEST_F(M8086Test, CanSetAFlagAndTheFlagRegisterIsModified)
 {
+	using namespace lp;
 	mProcessor.Flags = 0x0000;
 	mProcessor.Flags.A = 1;
 
