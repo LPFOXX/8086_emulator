@@ -160,7 +160,10 @@
   <ItemGroup>
     <ClCompile Include="8086_ADD.cpp" />
     <ClCompile Include="8086_ModRMByte.cpp" />
+    <ClCompile Include="CheckParaityTest.cpp" />
+    <ClCompile Include="GetRegisterTest.cpp" />
     <ClCompile Include="m8086Test.cpp" />
+    <ClCompile Include="SetRegisterTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="8086TestFixture.hpp" />
