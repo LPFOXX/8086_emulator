@@ -313,10 +313,10 @@ namespace lp
 								uint32_t result = destination + source;
 								setRegister(mrmb.RM, (Word)result, isWordInstruction);
 
-								Flags.C = result > (isWordInstruction ? 0xFFFF : 0xFF);
+								Flags.C = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
 								Flags.Z = result == 0;
 								Flags.S = (result & (isWordInstruction ? 0x8000 : 0x80)) > 0;
-								Flags.O = result > (isWordInstruction ? 0xFFFF : 0xFF);
+								Flags.O = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
 								Flags.P = CheckParity(result);
 								Flags.A = (destination & 0x0F) + (source & 0x0F) > 0x0F;
 							}
