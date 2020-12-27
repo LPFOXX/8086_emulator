@@ -1,7 +1,13 @@
+/**
+ * This file tests adding two bytes together.
+ *	source is a GPR.
+ *	destination is a GPR.
+ *	result (destination + source) is stored in the destination GPR.
+ */
 #include <utility>
 #include <gtest/gtest.h>
 
-#include "8086TestFixture.hpp"
+#include <m8086.hpp>
 
 using namespace lp::m8086;
 using ::testing::TestWithParam;
@@ -167,55 +173,3 @@ INSTANTIATE_TEST_SUITE_P(
 	Combine(
 	ValuesIn(registers),
 	ValuesIn(registers)));
-
-TEST_F(M8086Test, ADDEbGbCanAddTwoByteRegistersALPlusALResultInAL)
-{
-	Flags expectedFlags;
-	expectedFlags.C = false;
-	expectedFlags.Z = false;
-	expectedFlags.S = false;
-	expectedFlags.O = false;
-	expectedFlags.P = false;
-	expectedFlags.A = false;
-
-	Add2RegistersTestValues testValues;
-	testValues.processor = &mProcessor;
-	testValues.destReg = Registers::AL;
-	testValues.srcReg = Registers::AL;
-	testValues.sameRegs.value = 0x15;
-	testValues.sameRegs.expectedResult = 0x2A;
-	testValues.sameRegs.expectedFlags = expectedFlags;
-
-	addTwoByteRegisters(testValues);
-}
-
-TEST_F(M8086Test, ADDEbGbCanAddTwoByteRegistersBHPlusCLResultInBH)
-{
-	Flags expectedFlags;
-	expectedFlags.C = false;
-	expectedFlags.Z = false;
-	expectedFlags.S = true;
-	expectedFlags.O = false;
-	expectedFlags.P = true;
-	expectedFlags.A = false;
-
-	Add2RegistersTestValues testValues;
-	testValues.processor = &mProcessor;
-	testValues.destReg = Registers::BH;
-	testValues.destValue = 0x15;
-	testValues.srcReg = Registers::CL;
-	testValues.srcValue = 0xEA;
-	testValues.expectedResult = 0xFF;
-	testValues.expectedFlags = expectedFlags;
-
-	addTwoByteRegisters(testValues);
-}
-
-//TEST_F(M8086Test, ADDALIbCanAddAByteToALAndStoreTheValueIntoAL)
-//{
-//	mProcessor.AL = 0x10;
-//	mProcessor.mMemory[0x8000] = Processor::OpCodes::ADD_AL_Ib;
-//	mProcessor.mMemory[0x8001] = 0x74;
-//
-//	EXPECT_EQ(mProcessor.AL, 0x84);
-//}

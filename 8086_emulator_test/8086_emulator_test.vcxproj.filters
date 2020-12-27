@@ -18,9 +18,6 @@
     <ClCompile Include="m8086Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="8086_ADD.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="8086_ModRMByte.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -31,6 +28,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SetRegisterTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemReg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesRegReg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
