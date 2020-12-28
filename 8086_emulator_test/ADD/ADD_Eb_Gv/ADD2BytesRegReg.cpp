@@ -65,7 +65,7 @@ void addSameByteRegister(
 	processor.mMemory[0xFFFF1] =
 		ModRMByte(Mod::RegisterValue, testValues.srcReg, testValues.srcReg);
 
-	processor.executeInstruction(instructionsToExecute);
+	processor.executeInstructions(instructionsToExecute);
 
 	EXPECT_EQ(processor.CS, 0xFFFF);
 	EXPECT_EQ(processor.IP, 0x0002);
@@ -94,7 +94,7 @@ void addDifferentByteRegisters(
 	processor.mMemory[0xFFFF1] =
 		ModRMByte(Mod::RegisterValue, testValues.srcReg, testValues.destReg);
 
-	processor.executeInstruction(instructionsToExecute);
+	processor.executeInstructions(instructionsToExecute);
 
 	EXPECT_EQ(processor.CS, 0xFFFF);
 	EXPECT_EQ(processor.IP, 0x0002);

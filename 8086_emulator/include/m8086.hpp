@@ -13,6 +13,8 @@ union									\
 	Register name##X;					\
 }										\
 
+#define GET_MEM_ADDRESS(CS, IP) ((CS) << 4 | (IP))
+
 namespace lp
 {
 	namespace m8086
@@ -52,6 +54,18 @@ namespace lp
 			ByteDisplacement = 0b01,
 			WordDisplacement = 0b10,
 			RegisterValue = 0b11,
+		};
+
+		enum RM : Byte
+		{
+			BXPlusSI = 0b000,
+			BXPlusDI = 0b001,
+			BPPlusSI = 0b010,
+			BPPlusDI = 0b011,
+			RM_SI = 0b100,
+			RM_DI = 0b101,
+			RM_BP = 0b110,
+			RM_BX = 0b111,
 		};
 
 		union ModRMByte
@@ -96,9 +110,27 @@ namespace lp
 			// TODO: What to do when passing segment threshold
 			const Byte getByte(Register& CS, Register& IP) const
 			{
-				Byte byte = mMemory[(CS << 4) | IP];
+				Byte byte = mMemory[GET_MEM_ADDRESS(CS, IP)];
 				++IP;
 				return byte;
+			}
+
+			const Byte getByte(const uint32_t memAddress) const
+			{
+				return mMemory[memAddress];
+			}
+
+			const Word getWord(Register& CS, Register& IP) const
+			{
+				Byte lo = mMemory[GET_MEM_ADDRESS(CS, IP)]; ++IP;
+				Byte hi = mMemory[GET_MEM_ADDRESS(CS, IP)]; ++IP;
+
+				return (hi << 8) | lo;
+			}
+
+			void setByte(uint32_t memAddress, Byte byte)
+			{
+				mMemory[memAddress] = byte;
 			}
 
 			const ModRMByte getModRMByte(Register& CS, Register& IP) const
@@ -292,7 +324,37 @@ namespace lp
 				}
 			}
 
-			void executeInstruction(int instructionCount = -1)
+			void ADDChangeFlags(
+				Flags& flags,
+				uint32_t result,
+				Word destination,
+				Word source,
+				bool isWordInstruction)
+			{
+				Flags.C = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
+				Flags.Z = result == 0;
+				Flags.S = (result & (isWordInstruction ? 0x8000 : 0x80)) > 0;
+				Flags.O = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
+				Flags.P = CheckParity(result);
+				Flags.A = (destination & 0x0F) + (source & 0x0F) > 0x0F;
+			}
+
+			uint32_t getMemoryAddress(const RM addressingMode)
+			{
+				switch (addressingMode) {
+					case BXPlusSI:	return (DS << 4) + BX + SI;
+					case BXPlusDI:	return (DS << 4) + BX + DI;
+					case BPPlusSI:	return (SS << 4) + BP + SI;
+					case BPPlusDI:	return (SS << 4) + BP + DI;
+					case RM_SI:		return (DS << 4) + SI;
+					case RM_DI:		return (DS << 4) + DI;
+					case RM_BP:		return (SS << 4) + BP;
+					case RM_BX:		return (DS << 4) + BX;
+					default: throw - 1;
+				}
+			}
+
+			void executeInstructions(int instructionCount = -1)
 			{
 				while (instructionCount > 0 || instructionCount == -1) {
 					const Byte instruction = mMemory.getByte(CS, IP);
@@ -303,22 +365,54 @@ namespace lp
 						case OpCodes::ADD_Eb_Gb:
 						{
 							const ModRMByte mrmb = mMemory.getModRMByte(CS, IP);
+							Register source = getRegister((Registers)mrmb.Reg);
 
-							enforceByte(mrmb.Reg);
+							switch (mrmb.Mod) {
+								case Mod::RegisterValue:
+								{
+									Register destination = getRegister((Registers)mrmb.RM);
+									uint32_t result = destination + source;
+									setRegister(mrmb.RM, (Word)result, isWordInstruction);
 
-							if (mrmb.Mod == (Byte)Mod::RegisterValue) {
-								enforceByte(mrmb.RM);
-								Register destination = getRegister((Registers)mrmb.RM);
-								Register source = getRegister((Registers)mrmb.Reg);
-								uint32_t result = destination + source;
-								setRegister(mrmb.RM, (Word)result, isWordInstruction);
+									ADDChangeFlags(Flags, result, destination, source, isWordInstruction);
+									break;
+								}
+								case Mod::NoDisplacement:
+								{
+									if (mrmb.RM == RM::RM_BP) {
+										// 16bits displacement
+										Word displacement = mMemory.getWord(CS, IP);
+										uint32_t memoryAddress = (DS << 4) + displacement;
+										Byte memoryContent = mMemory.getByte(memoryAddress);
+										uint32_t result = memoryContent + source;
 
-								Flags.C = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
-								Flags.Z = result == 0;
-								Flags.S = (result & (isWordInstruction ? 0x8000 : 0x80)) > 0;
-								Flags.O = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
-								Flags.P = CheckParity(result);
-								Flags.A = (destination & 0x0F) + (source & 0x0F) > 0x0F;
+										mMemory.setByte(memoryAddress, result);
+
+										ADDChangeFlags(Flags, result, memoryContent, source, isWordInstruction);
+									}
+									else {
+										// no displacement
+										uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM);
+										Byte memoryContent = mMemory.getByte(memoryAddress);
+										uint32_t result = memoryContent + source;
+
+										mMemory.setByte(memoryAddress, result);
+										ADDChangeFlags(Flags, result, memoryContent, source, isWordInstruction);
+									}
+									break;
+								}
+								case Mod::ByteDisplacement:
+								{
+									Byte displacement = mMemory.getByte(CS, IP);
+									uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM) + displacement;
+									Byte memoryContent = mMemory.getByte(memoryAddress);
+									uint32_t result = memoryContent + source;
+
+									mMemory.setByte(memoryAddress, result);
+									ADDChangeFlags(Flags, result, memoryContent, source, isWordInstruction);
+									break;
+								}
+								default: throw - 1;
 							}
 							break;
 						}
