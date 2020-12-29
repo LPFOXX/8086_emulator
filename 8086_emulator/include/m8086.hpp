@@ -339,17 +339,17 @@ namespace lp
 				Flags.A = (destination & 0x0F) + (source & 0x0F) > 0x0F;
 			}
 
-			uint32_t getMemoryAddress(const RM addressingMode)
+			uint32_t getMemoryAddress(const RM addressingMode, const Word displacement = 0x0000)
 			{
 				switch (addressingMode) {
-					case BXPlusSI:	return (DS << 4) + BX + SI;
-					case BXPlusDI:	return (DS << 4) + BX + DI;
-					case BPPlusSI:	return (SS << 4) + BP + SI;
-					case BPPlusDI:	return (SS << 4) + BP + DI;
-					case RM_SI:		return (DS << 4) + SI;
-					case RM_DI:		return (DS << 4) + DI;
-					case RM_BP:		return (SS << 4) + BP;
-					case RM_BX:		return (DS << 4) + BX;
+					case BXPlusSI:	return (DS << 4) + BX + SI + displacement;
+					case BXPlusDI:	return (DS << 4) + BX + DI + displacement;
+					case BPPlusSI:	return (SS << 4) + BP + SI + displacement;
+					case BPPlusDI:	return (SS << 4) + BP + DI + displacement;
+					case RM_SI:		return (DS << 4) + SI + displacement;
+					case RM_DI:		return (DS << 4) + DI + displacement;
+					case RM_BP:		return (SS << 4) + BP + displacement;
+					case RM_BX:		return (DS << 4) + BX + displacement;
 					default: throw - 1;
 				}
 			}
@@ -387,12 +387,11 @@ namespace lp
 										uint32_t result = memoryContent + source;
 
 										mMemory.setByte(memoryAddress, result);
-
 										ADDChangeFlags(Flags, result, memoryContent, source, isWordInstruction);
 									}
 									else {
 										// no displacement
-										uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM);
+										uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM, 0);
 										Byte memoryContent = mMemory.getByte(memoryAddress);
 										uint32_t result = memoryContent + source;
 
@@ -404,7 +403,18 @@ namespace lp
 								case Mod::ByteDisplacement:
 								{
 									Byte displacement = mMemory.getByte(CS, IP);
-									uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM) + displacement;
+									uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM, displacement);
+									Byte memoryContent = mMemory.getByte(memoryAddress);
+									uint32_t result = memoryContent + source;
+
+									mMemory.setByte(memoryAddress, result);
+									ADDChangeFlags(Flags, result, memoryContent, source, isWordInstruction);
+									break;
+								}
+								case Mod::WordDisplacement:
+								{
+									Word displacement = mMemory.getWord(CS, IP);
+									uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM, displacement);
 									Byte memoryContent = mMemory.getByte(memoryAddress);
 									uint32_t result = memoryContent + source;
 
