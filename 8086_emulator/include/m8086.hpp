@@ -135,8 +135,7 @@ namespace lp
 
 			const ModRMByte getModRMByte(Register& CS, Register& IP) const
 			{
-				ModRMByte byte = mMemory[(CS << 4) | IP];
-				++IP;
+				ModRMByte byte = mMemory[(CS << 4) | IP]; ++IP;
 				return byte;
 			}
 
@@ -324,21 +323,6 @@ namespace lp
 				}
 			}
 
-			void ADDChangeFlags(
-				Flags& flags,
-				uint32_t result,
-				Word destination,
-				Word source,
-				bool isWordInstruction)
-			{
-				Flags.C = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
-				Flags.Z = result == 0;
-				Flags.S = (result & (isWordInstruction ? 0x8000 : 0x80)) > 0;
-				Flags.O = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
-				Flags.P = CheckParity(result);
-				Flags.A = (destination & 0x0F) + (source & 0x0F) > 0x0F;
-			}
-
 			uint32_t getMemoryAddress(const RM addressingMode, const Word displacement = 0x0000)
 			{
 				switch (addressingMode) {
@@ -362,70 +346,7 @@ namespace lp
 					const bool isWordInstruction = (instruction & 0b00000001) > 0;
 
 					switch (instruction) {
-						case OpCodes::ADD_Eb_Gb:
-						{
-							const ModRMByte mrmb = mMemory.getModRMByte(CS, IP);
-							Register source = getRegister((Registers)mrmb.Reg);
-
-							switch (mrmb.Mod) {
-								case Mod::RegisterValue:
-								{
-									Register destination = getRegister((Registers)mrmb.RM);
-									uint32_t result = destination + source;
-									setRegister(mrmb.RM, (Word)result, isWordInstruction);
-
-									ADDChangeFlags(Flags, result, destination, source, isWordInstruction);
-									break;
-								}
-								case Mod::NoDisplacement:
-								{
-									if (mrmb.RM == RM::RM_BP) {
-										// 16bits displacement
-										Word displacement = mMemory.getWord(CS, IP);
-										uint32_t memoryAddress = (DS << 4) + displacement;
-										Byte memoryContent = mMemory.getByte(memoryAddress);
-										uint32_t result = memoryContent + source;
-
-										mMemory.setByte(memoryAddress, result);
-										ADDChangeFlags(Flags, result, memoryContent, source, isWordInstruction);
-									}
-									else {
-										// no displacement
-										uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM, 0);
-										Byte memoryContent = mMemory.getByte(memoryAddress);
-										uint32_t result = memoryContent + source;
-
-										mMemory.setByte(memoryAddress, result);
-										ADDChangeFlags(Flags, result, memoryContent, source, isWordInstruction);
-									}
-									break;
-								}
-								case Mod::ByteDisplacement:
-								{
-									Byte displacement = mMemory.getByte(CS, IP);
-									uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM, displacement);
-									Byte memoryContent = mMemory.getByte(memoryAddress);
-									uint32_t result = memoryContent + source;
-
-									mMemory.setByte(memoryAddress, result);
-									ADDChangeFlags(Flags, result, memoryContent, source, isWordInstruction);
-									break;
-								}
-								case Mod::WordDisplacement:
-								{
-									Word displacement = mMemory.getWord(CS, IP);
-									uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM, displacement);
-									Byte memoryContent = mMemory.getByte(memoryAddress);
-									uint32_t result = memoryContent + source;
-
-									mMemory.setByte(memoryAddress, result);
-									ADDChangeFlags(Flags, result, memoryContent, source, isWordInstruction);
-									break;
-								}
-								default: throw - 1;
-							}
-							break;
-						}
+						case OpCodes::ADD_Eb_Gb: ADDEbGb(isWordInstruction); break;
 						default: throw - 1;
 					}
 					--instructionCount;
@@ -464,6 +385,81 @@ namespace lp
 
 			// Memory:
 			Memory mMemory;
+
+		private:
+			void ADDEbGb(bool isWordInstruction)
+			{
+				const ModRMByte mrmb = mMemory.getModRMByte(CS, IP);
+				Register source = getRegister((Registers)mrmb.Reg);
+
+				switch (mrmb.Mod) {
+					case Mod::RegisterValue:
+					{
+						Register destination = getRegister((Registers)mrmb.RM);
+						uint32_t result = destination + source;
+						setRegister(mrmb.RM, (Word)result, isWordInstruction);
+
+						ADDChangeFlags(result, destination, source, isWordInstruction);
+						break;
+					}
+					case Mod::NoDisplacement:
+					{
+						if (mrmb.RM == RM::RM_BP) {
+							// 16bits displacement
+							Word displacement = mMemory.getWord(CS, IP);
+							uint32_t memoryAddress = (DS << 4) + displacement;
+							Byte memoryContent = mMemory.getByte(memoryAddress);
+							uint32_t result = memoryContent + source;
+
+							mMemory.setByte(memoryAddress, result);
+							ADDChangeFlags(result, memoryContent, source, isWordInstruction);
+						}
+						else {
+							// no displacement
+							uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM, 0);
+							Byte memoryContent = mMemory.getByte(memoryAddress);
+							uint32_t result = memoryContent + source;
+
+							mMemory.setByte(memoryAddress, result);
+							ADDChangeFlags(result, memoryContent, source, isWordInstruction);
+						}
+						break;
+					}
+					case Mod::ByteDisplacement:
+					{
+						Byte displacement = mMemory.getByte(CS, IP);
+						uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM, displacement);
+						Byte memoryContent = mMemory.getByte(memoryAddress);
+						uint32_t result = memoryContent + source;
+
+						mMemory.setByte(memoryAddress, result);
+						ADDChangeFlags(result, memoryContent, source, isWordInstruction);
+						break;
+					}
+					case Mod::WordDisplacement:
+					{
+						Word displacement = mMemory.getWord(CS, IP);
+						uint32_t memoryAddress = getMemoryAddress((RM)mrmb.RM, displacement);
+						Byte memoryContent = mMemory.getByte(memoryAddress);
+						uint32_t result = memoryContent + source;
+
+						mMemory.setByte(memoryAddress, result);
+						ADDChangeFlags(result, memoryContent, source, isWordInstruction);
+						break;
+					}
+					default: throw - 1;
+				}
+			}
+
+			void ADDChangeFlags(uint32_t result, Word destination, Word source, bool isWordInstruction)
+			{
+				Flags.C = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
+				Flags.Z = result == 0;
+				Flags.S = (result & (isWordInstruction ? 0x8000 : 0x80)) > 0;
+				Flags.O = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
+				Flags.P = CheckParity(result);
+				Flags.A = (destination & 0x0F) + (source & 0x0F) > 0x0F;
+			}
 		};
 	}
 }
