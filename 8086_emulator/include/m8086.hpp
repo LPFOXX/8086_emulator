@@ -13,7 +13,7 @@ union									\
 	Register name##X;					\
 }										\
 
-#define GET_MEM_ADDRESS(CS, IP) ((CS) << 4 | (IP))
+#define GET_MEM_ADDRESS(CS, IP) (((CS) << 4) + (IP))
 
 namespace lp
 {

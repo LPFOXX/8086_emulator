@@ -161,6 +161,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemReg8BitDisplacement.cpp" />
+    <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemRegNoDisplacement.cpp" />
     <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesRegReg.cpp" />
     <ClCompile Include="8086_ModRMByte.cpp" />
     <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemReg.cpp" />

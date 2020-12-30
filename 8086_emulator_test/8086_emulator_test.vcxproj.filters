@@ -36,6 +36,12 @@
     <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesRegReg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemRegNoDisplacement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemReg8BitDisplacement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="8086TestFixture.hpp">
