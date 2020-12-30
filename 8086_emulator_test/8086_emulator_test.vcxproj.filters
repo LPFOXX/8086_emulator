@@ -30,9 +30,6 @@
     <ClCompile Include="SetRegisterTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemReg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesRegReg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,6 +37,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemReg8BitDisplacement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemReg16BitDisplacement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ADD\ADD_Eb_Gv\ADD2BytesMemRegDirectAddressingMode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

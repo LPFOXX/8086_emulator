@@ -453,12 +453,17 @@ namespace lp
 
 			void ADDChangeFlags(uint32_t result, Word destination, Word source, bool isWordInstruction)
 			{
-				Flags.C = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
+				Word negativeBit = isWordInstruction ? 0x8000 : 0x80;
+				Word operandSizeMask = isWordInstruction ? 0xFFFF : 0xFF;
+				Word actualResult = result & operandSizeMask;
+				bool sameSign = !((destination ^ source) & negativeBit);
+
+				Flags.C = result > (uint32_t)(operandSizeMask);
 				Flags.Z = result == 0;
-				Flags.S = (result & (isWordInstruction ? 0x8000 : 0x80)) > 0;
-				Flags.O = result > (uint32_t)(isWordInstruction ? 0xFFFF : 0xFF);
-				Flags.P = CheckParity(result);
+				Flags.S = (result & negativeBit) > 0;
+				Flags.P = CheckParity(actualResult);
 				Flags.A = (destination & 0x0F) + (source & 0x0F) > 0x0F;
+				Flags.O = sameSign && ((actualResult ^ source) & negativeBit);
 			}
 		};
 	}

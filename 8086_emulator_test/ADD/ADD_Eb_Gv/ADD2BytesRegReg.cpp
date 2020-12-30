@@ -11,6 +11,7 @@
 
 using namespace lp::m8086;
 using ::testing::TestWithParam;
+using ::testing::Test;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
@@ -43,6 +44,20 @@ public:
 
 protected:
 	Processor mProcessor;
+};
+
+class ADDEbGbRegRegOverflowTest : public Test
+{
+protected:
+	void SetUp() override
+	{
+		mProcessor.reset();
+		mProcessor.mMemory[0xFFFF0] = Processor::OpCodes::ADD_Eb_Gb;
+	}
+
+protected:
+	Processor mProcessor;
+	int mInstructionsToExecute = 1;
 };
 
 void addSameByteRegister(
@@ -173,3 +188,69 @@ INSTANTIATE_TEST_SUITE_P(
 	Combine(
 	ValuesIn(registers),
 	ValuesIn(registers)));
+
+TEST_F(ADDEbGbRegRegOverflowTest, CanSetOverflowFlagWhenAddingTwoPositivesNumbersAndResultIsNegative)
+{
+	mProcessor.AL = 0x7F;	// 0111_1111 -> 127
+	mProcessor.BL = 0x01;	// 0000_0001 -> 001
+	// result AL = AL+BL	   1000 0000 -> -128
+
+	mProcessor.Flags.C = true;
+	mProcessor.Flags.Z = true;
+	mProcessor.Flags.S = false;
+	mProcessor.Flags.O = false;
+	mProcessor.Flags.P = true;
+	mProcessor.Flags.A = false;
+
+	mProcessor.mMemory[0xFFFF1] = ModRMByte(Mod::RegisterValue, Registers::BL, Registers::AL);
+
+	// when:
+	mProcessor.executeInstructions(mInstructionsToExecute);
+
+	EXPECT_EQ(mProcessor.CS, 0xFFFF);
+	EXPECT_EQ(mProcessor.IP, 0x0002);
+
+	EXPECT_EQ(mProcessor.AL, 0x80);
+	EXPECT_EQ(mProcessor.BL, 0x01);
+
+	const Flags& flags = mProcessor.Flags;
+	EXPECT_FALSE(flags.C);
+	EXPECT_FALSE(flags.Z);
+	EXPECT_TRUE(flags.S);
+	EXPECT_TRUE(flags.O);
+	EXPECT_FALSE(flags.P);
+	EXPECT_TRUE(flags.A);
+}
+
+TEST_F(ADDEbGbRegRegOverflowTest, CanSetOverflowFlagWhenAddingTwoNegativesNumbersAndResultIsPositive)
+{
+	mProcessor.AL = 0x80;	// 1000_0000 -> -128
+	mProcessor.BL = 0xFF;	// 1111_1111 -> -001
+	// result AL = AL+BL	  10111_1111 ->  127 0x7F
+
+	mProcessor.Flags.C = false;
+	mProcessor.Flags.Z = true;
+	mProcessor.Flags.S = true;
+	mProcessor.Flags.O = false;
+	mProcessor.Flags.P = true;
+	mProcessor.Flags.A = true;
+
+	mProcessor.mMemory[0xFFFF1] = ModRMByte(Mod::RegisterValue, Registers::BL, Registers::AL);
+
+	// when:
+	mProcessor.executeInstructions(mInstructionsToExecute);
+
+	EXPECT_EQ(mProcessor.CS, 0xFFFF);
+	EXPECT_EQ(mProcessor.IP, 0x0002);
+
+	EXPECT_EQ(mProcessor.AL, 0x7F);
+	EXPECT_EQ(mProcessor.BL, 0xFF);
+
+	const Flags& flags = mProcessor.Flags;
+	EXPECT_TRUE(flags.C);
+	EXPECT_FALSE(flags.Z);
+	EXPECT_FALSE(flags.S);
+	EXPECT_TRUE(flags.O);
+	EXPECT_FALSE(flags.P);
+	EXPECT_FALSE(flags.A);
+}
