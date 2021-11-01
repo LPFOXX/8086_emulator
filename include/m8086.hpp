@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
+#include <cstring>
 
 #define REGISTER(name)					\
 union									\

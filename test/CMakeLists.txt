@@ -13,4 +13,3 @@ add_subdirectory(vendor/google_test)
 
 add_executable(8086_emulator_test 8086_ModRMByte.cpp 8086TestFixture.hpp CheckParaityTest.cpp GetRegisterTest.cpp m8086Test.cpp SetRegisterTest.cpp)
 target_link_libraries(8086_emulator_test gtest gtest_main)
-
