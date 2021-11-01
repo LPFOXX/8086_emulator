@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/8086_emulator_test.dir/8086_ModRMByte.cpp.o CMakeFiles/8086_emulator_test.dir/CheckParaityTest.cpp.o CMakeFiles/8086_emulator_test.dir/GetRegisterTest.cpp.o CMakeFiles/8086_emulator_test.dir/m8086Test.cpp.o CMakeFiles/8086_emulator_test.dir/SetRegisterTest.cpp.o -o 8086_emulator_test  lib/libgtestd.a lib/libgtest_maind.a lib/libgtestd.a -lpthread 
