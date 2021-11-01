@@ -96,7 +96,7 @@ TEST_F(M8086Test, CanSetAFlagAndTheFlagRegisterIsModified)
 	mProcessor.Flags = 0x0000;
 	mProcessor.Flags.A = 1;
 
-	EXPECT_EQ(mProcessor.Flags, m8086::FlagMasks::AuxiliarFlagMask);
+	EXPECT_EQ(mProcessor.Flags, m8086::FlagMasks::AuxiliaryFlagMask);
 }
 
 TEST_F(M8086Test, CanSetMultipleFlagsAndTheFlagRegisterIsModifiedAccordingly)
@@ -109,14 +109,14 @@ TEST_F(M8086Test, CanSetMultipleFlagsAndTheFlagRegisterIsModifiedAccordingly)
 	mProcessor.Flags.O = true;
 
 	const Word multipleFlagsSet =
-		(Word)FlagMasks::AuxiliarFlagMask |
+		(Word)FlagMasks::AuxiliaryFlagMask |
 		(Word)FlagMasks::CarryFlagMask |
 		(Word)FlagMasks::OverflowFlagMask;
 
-	const Word flags = mProcessor.Flags;
+	const ProcessorFlags flags = mProcessor.Flags;
 
 	EXPECT_EQ(flags, multipleFlagsSet);
-	EXPECT_TRUE((flags & (Word)FlagMasks::AuxiliarFlagMask) > 0);
-	EXPECT_TRUE((flags & (Word)FlagMasks::CarryFlagMask) > 0);
-	EXPECT_TRUE((flags & (Word)FlagMasks::OverflowFlagMask) > 0);
+	EXPECT_TRUE(flags & FlagMasks::AuxiliaryFlagMask);
+	EXPECT_TRUE(flags & FlagMasks::CarryFlagMask);
+	EXPECT_TRUE(flags & FlagMasks::OverflowFlagMask);
 }
