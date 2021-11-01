@@ -1,9 +1,0 @@
-/home/lidneup/repos/8086_emulator/test/cmake-build-release/CMakeFiles/rebuild_cache.dir
-/home/lidneup/repos/8086_emulator/test/cmake-build-release/CMakeFiles/edit_cache.dir
-/home/lidneup/repos/8086_emulator/test/cmake-build-release/CMakeFiles/8086_emulator_test.dir
-/home/lidneup/repos/8086_emulator/test/cmake-build-release/vendor/google_test/CMakeFiles/rebuild_cache.dir
-/home/lidneup/repos/8086_emulator/test/cmake-build-release/vendor/google_test/CMakeFiles/edit_cache.dir
-/home/lidneup/repos/8086_emulator/test/cmake-build-release/vendor/google_test/googletest/CMakeFiles/rebuild_cache.dir
-/home/lidneup/repos/8086_emulator/test/cmake-build-release/vendor/google_test/googletest/CMakeFiles/edit_cache.dir
-/home/lidneup/repos/8086_emulator/test/cmake-build-release/vendor/google_test/googletest/CMakeFiles/gtest_main.dir
-/home/lidneup/repos/8086_emulator/test/cmake-build-release/vendor/google_test/googletest/CMakeFiles/gtest.dir
