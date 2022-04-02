@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include "8086TestFixture.hpp"
 
 TEST_F(M8086Test, CanSetAXRegisterAndGetMostSignificantByteInAH)

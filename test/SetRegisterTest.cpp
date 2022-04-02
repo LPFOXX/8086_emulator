@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-
-#include <m8086.hpp>
+#include "8086.hpp"
 
 using ::testing::Test;
 using namespace lp::m8086;

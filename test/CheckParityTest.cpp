@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-
-#include <m8086.hpp>
+#include "8086.hpp"
 
 using namespace lp::m8086;
 using ::testing::TestWithParam;
