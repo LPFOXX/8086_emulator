@@ -17,11 +17,11 @@ if(LPEM8086_BUILD_TESTS)
 	message(STATUS ${ADD_SRC})
 
 	add_executable(8086_emulator_test
-		8086_ModRMByte.cpp
 		CheckParityTest.cpp
-		GetRegisterTest.cpp
-		m8086Test.cpp
-		SetRegisterTest.cpp
+		# 8086_ModRMByte.cpp
+		# GetRegisterTest.cpp
+		# m8086Test.cpp
+		# SetRegisterTest.cpp
 		${ADD_SRC}
 	)
 	

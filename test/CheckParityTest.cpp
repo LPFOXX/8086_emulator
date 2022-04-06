@@ -1,30 +1,36 @@
-#include <gtest/gtest.h>
-#include "8086.hpp"
+#include <tuple>
 
-using namespace lp::m8086;
+#include <gtest/gtest.h>
+#include "Processor.hpp"
+
+using namespace lp::emul8086;
 using ::testing::TestWithParam;
 using ::testing::ValuesIn;
 
 struct ParityCheck
 {
-	ParityCheck(const uint32_t v, bool p) : value(v), isPar(p)
-	{
-	}
-	uint32_t value;
-	bool isPar;		// when true, parity is event
+	ParityCheck(const DoubleWord v, bool p) : value(v), isPar(p) {}
+
+	DoubleWord value;
+	bool isPar;		// when true, parity is even
 };
 
-class CheckParityTestWithParam : public TestWithParam<ParityCheck>
+class CheckParityTestWithParam : public TestWithParam<std::tuple<Word, bool>>
 {
 };
+
+TEST(TestSometing, TestName)
+{
+	EXPECT_EQ(1, 2 - 1);
+}
 
 TEST_P(CheckParityTestWithParam, CanTest8BitValues)
 {
-	const auto& pair = GetParam();
-	EXPECT_EQ(Processor::CheckParity(pair.value), pair.isPar);
+	const auto& [value, isPar] = GetParam();
+	EXPECT_EQ(Processor::CheckParity(value), isPar);
 }
 
-const std::vector<ParityCheck> values8bits = {
+const std::vector<std::tuple<Word, bool>> values8bits = {
 	{0b10001110, true},
 	{0b11000001, false},
 	{0b11100000, false},
@@ -79,7 +85,7 @@ const std::vector<ParityCheck> values8bits = {
 	{0b01000110, false}
 };
 
-const std::vector<ParityCheck> values16bits = {
+const std::vector<std::tuple<Word, bool>> values16bits = {
 			{ 0b1000010100111011, true },
 			{ 0b1000111001001101, true },
 			{ 0b1010000110001011, false },

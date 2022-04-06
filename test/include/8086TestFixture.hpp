@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 #include "8086.hpp"
 
+#include "Processor.hpp"
+
 class M8086Test : public ::testing::Test
 {
 	void SetUp() override
@@ -10,5 +12,5 @@ class M8086Test : public ::testing::Test
 		mProcessor.reset();
 	}
 protected:
-	lp::m8086::Processor mProcessor;
+	lp::emul8086::Processor mProcessor;
 };
