@@ -5,7 +5,7 @@ if(LPEM8086_BUILD_TESTS)
 
 	include_directories(vendor/google_test/googletest/include)
 	include_directories(${PROJECT_SOURCE_DIR}/lib/include)
-	include_directories(./include)
+	include_directories(include)
 
 	set(BUILD_GMOCK OFF CACHE BOOL "Test lib only" FORCE)
 	set(INSTALL_GTEST CACHE BOOL "Do not install test library" FORCE)
@@ -18,10 +18,12 @@ if(LPEM8086_BUILD_TESTS)
 
 	add_executable(8086_emulator_test
 		CheckParityTest.cpp
-		# 8086_ModRMByte.cpp
-		# GetRegisterTest.cpp
-		# m8086Test.cpp
-		# SetRegisterTest.cpp
+		GetRegisterTest.cpp
+		SetRegisterTest.cpp
+		ModRmByteTest.cpp
+		GeneralPurposeRegistersTest.cpp
+		ProcessorFlagsTest.cpp
+		8086Test.cpp
 		${ADD_SRC}
 	)
 	
@@ -31,5 +33,5 @@ if(LPEM8086_BUILD_TESTS)
 	# link library as a dependency
 	target_link_libraries(8086_emulator_test 8086_emulator)
 
-	add_test(NAME tests COMMAND 8086_emulator_test)
+	add_test(8086_emulator_test 8086_emulator_test)
 endif()

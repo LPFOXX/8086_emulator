@@ -5,4 +5,5 @@ include_directories(./include)
 add_library(8086_emulator 
 	src/8086.cpp
 	"src/Memory.cpp"
-	"src/Processor.cpp")
+	"src/Processor.cpp"
+)

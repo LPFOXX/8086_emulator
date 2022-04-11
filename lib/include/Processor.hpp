@@ -1,8 +1,10 @@
 #pragma once
 
 #include "primitives.hpp"
+
 #include "ProcessorFlags.hpp"
 #include "Memory.hpp"
+#include "Registers.hpp"
 
 namespace lp::emul8086 {
 	class Processor {
@@ -21,12 +23,19 @@ namespace lp::emul8086 {
 		static void EnforceWord(Byte reg);
 
 		void reset();
-		
+
 		Register getRegister(Byte reg, bool word = false) const;
-		Register getRegister(Rm reg, bool word = false) const;
-		
+		Register getRegister(Registers reg, bool word = false) const;
+
+		inline Register getRegister(Rm reg, bool word = false) const
+		{
+			//return getRegister(static_cast<Registers>(reg), word);
+			return (Register)0;
+		}
+
 		void setRegister(Byte reg, Word value, bool word = false);
 		void setRegister(Rm reg, Word value, bool word = false);
+		void setRegister(Registers reg, Word value, bool word = false);
 
 		Address getMemoryAddress(const Rm addressingMode, const Word displacement = 0x0000) const;
 
@@ -52,10 +61,11 @@ namespace lp::emul8086 {
 		Register ES{};    // Extra Segment
 		Register IP{};    // Instruction Pointer
 
-	private:
+	public:
 		// ProcessorFlags
 		ProcessorFlags Flags;
 
+	private:
 		// Memory:
 		Memory mMemory;
 

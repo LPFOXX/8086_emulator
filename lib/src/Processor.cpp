@@ -13,7 +13,7 @@ namespace lp::emul8086 {
 		return (parityCount & 0x0001) == 0;
 	}
 
-	void Processor::EnforceByte(Byte reg) {
+	/*void Processor::EnforceByte(Byte reg) {
 		switch (reg) {
 		case Registers::AL:
 		case Registers::BL:
@@ -27,9 +27,9 @@ namespace lp::emul8086 {
 		default:
 			throw - 1;
 		}
-	}
+	}*/
 
-	void Processor::EnforceWord(Byte reg) {
+	/*void Processor::EnforceWord(Byte reg) {
 		switch (reg) {
 		case Registers::AX:
 		case Registers::BX:
@@ -43,13 +43,13 @@ namespace lp::emul8086 {
 		default:
 			throw - 1;
 		}
-	}
+	}*/
 
 	void Processor::reset() {
 		CS = 0xFFFF;
 		IP = 0x0000;
 
-		Flags = 0;
+		Flags = 0x0000;
 
 		AX = 0;
 		BX = 0;
@@ -65,6 +65,11 @@ namespace lp::emul8086 {
 	}
 
 	Register Processor::getRegister(Byte reg, bool word) const
+	{
+		return (Register)0;
+	}
+
+	Register Processor::getRegister(Registers reg, bool word) const
 	{
 		if (!word) {
 			switch (reg) {
@@ -112,12 +117,7 @@ namespace lp::emul8086 {
 		}
 	}
 
-	inline Register Processor::getRegister(Rm reg, bool word) const
-	{
-		return getRegister(static_cast<Byte>(reg), word);
-	}
-
-	void Processor::setRegister(Byte reg, Word value, bool word) {
+	void Processor::setRegister(Registers reg, Word value, bool word) {
 		if (!word) {
 			switch (reg) {
 			case Registers::AL:
@@ -183,6 +183,11 @@ namespace lp::emul8086 {
 	void Processor::setRegister(Rm reg, Word value, bool word)
 	{
 		setRegister(static_cast<Byte>(reg), value, word);
+	}
+
+	void Processor::setRegister(Byte reg, Word value, bool word)
+	{
+
 	}
 
 	Address Processor::getMemoryAddress(const Rm addressingMode, const Word displacement) const {

@@ -5,7 +5,7 @@
 
 #include "Processor.hpp"
 
-class M8086Test : public ::testing::Test
+class ProcessorTestFixture : public ::testing::Test
 {
 	void SetUp() override
 	{

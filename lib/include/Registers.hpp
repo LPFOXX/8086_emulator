@@ -3,7 +3,7 @@
 #include "primitives.hpp"
 
 namespace lp::emul8086 {
-	enum Registers : Byte {
+	enum class Registers : Byte {
 		// 8bits
 		// Lo
 		AL = 0b000,

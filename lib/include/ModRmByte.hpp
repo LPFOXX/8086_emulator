@@ -28,14 +28,14 @@ namespace lp::emul8086 {
 
 		ModRmByte(Byte mod, Byte reg, Byte rm) : Mod(mod), Reg(reg), Rm(rm) {}
 
-		explicit operator Byte() const {
+		/*explicit operator Byte() const {
 			Byte b = Mod;
 			b <<= 3;
 			b |= Reg;
 			b <<= 3;
 			b |= Rm;
 			return b;
-		}
+		}*/
 
 		struct {
 			Byte Mod : 2;    // register mode: 2bits

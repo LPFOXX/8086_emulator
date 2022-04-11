@@ -19,11 +19,6 @@ class CheckParityTestWithParam : public TestWithParam<std::tuple<Word, bool>>
 {
 };
 
-TEST(TestSometing, TestName)
-{
-	EXPECT_EQ(1, 2 - 1);
-}
-
 TEST_P(CheckParityTestWithParam, CanTest8BitValues)
 {
 	const auto& [value, isPar] = GetParam();
